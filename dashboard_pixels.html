@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=480, height=800, initial-scale=1.0">
+    <title>Pixel Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=VT323&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --pixel-bg: #ffffff;
+            --pixel-fg: #000000;
+            --border-width: 3px;
+        }
+
+        html, body {
+            width: 480px;
+            height: 800px;
+            margin: 0; padding: 0;
+            overflow: hidden;
+            background-color: var(--pixel-bg);
+            color: var(--pixel-fg);
+            font-family: 'VT323', monospace; /* Default to terminal font */
+            box-sizing: border-box;
+        }
+
+        /* Pixel Font Helper */
+        .font-pixel { font-family: 'Silkscreen', cursive; }
+        
+        /* The "Hard Shadow" retro look */
+        .retro-shadow {
+            border: var(--border-width) solid black;
+            box-shadow: 4px 4px 0px 0px black;
+        }
+        
+        .retro-box {
+            border: var(--border-width) solid black;
+        }
+
+        /* Dot Matrix Background Pattern */
+        .bg-dots {
+            background-image: radial-gradient(black 15%, transparent 16%);
+            background-size: 6px 6px;
+        }
+
+        /* Scrollbar Hiding */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+
+        /* Icon adjustment for pixel look */
+        .icon-pixel {
+            stroke-width: 2.5px;
+            shape-rendering: geometricPrecision; /* Tries to keep lines sharp */
+        }
+    </style>
+</head>
+<body class="flex flex-col w-full h-full p-4 gap-4 bg-dots">
+
+    <header class="h-[140px] flex gap-4">
+        
+        <div class="flex-1 bg-white retro-shadow flex flex-col items-center justify-center relative p-2">
+            <div class="absolute top-0 left-0 bg-black text-white px-2 py-0.5 text-lg leading-none border-b-2 border-r-2 border-white">
+                SYS_TIME
+            </div>
+            <div class="font-pixel text-6xl tracking-tighter mt-4">
+                {{ klockslag }}
+            </div>
+            <div class="flex gap-2 text-xl uppercase mt-1">
+                <span class="font-bold">{{ datum_dag }}</span>
+                <span>/</span>
+                <span>{{ datum_manad }}</span>
+            </div>
+        </div>
+
+        <div class="w-[110px] bg-white retro-shadow flex flex-col items-center justify-center relative">
+            <div class="absolute top-0 right-0 bg-black text-white px-1 text-sm border-b-2 border-l-2 border-white">
+                TEMP
+            </div>
+            <i data-lucide="{{ vader_ikon }}" class="w-10 h-10 mb-1 icon-pixel"></i>
+            <span class="font-pixel text-3xl">{{ vader_temp }}°</span>
+        </div>
+    </header>
+
+    <section class="h-[280px] bg-white retro-shadow flex flex-col p-1">
+        <div class="h-8 bg-black w-full flex items-center justify-between px-2 text-white mb-1">
+            <span class="font-pixel text-xs">CALENDAR.EXE</span>
+            <div class="flex gap-1">
+                <div class="w-3 h-3 bg-white border border-black"></div>
+                <div class="w-3 h-3 bg-white border border-black"></div>
+            </div>
+        </div>
+
+        <div class="flex-1 border-2 border-black p-1 relative overflow-hidden flex flex-col">
+             <div class="h-6 flex border-b-2 border-black border-dashed mb-1" id="calendar-header"></div>
+             
+             <div class="flex-1 relative w-full" id="calendar-body">
+                 <div class="absolute inset-0 flex flex-col justify-between pointer-events-none z-0 opacity-20">
+                     <div class="w-full h-px bg-black"></div>
+                     <div class="w-full h-px bg-black"></div>
+                     <div class="w-full h-px bg-black"></div>
+                     <div class="w-full h-px bg-black"></div>
+                 </div>
+                 <div id="calendar-columns" class="absolute inset-0 flex w-full h-full z-10 gap-1"></div>
+             </div>
+        </div>
+    </section>
+
+    <section class="flex-1 bg-white retro-shadow flex flex-col p-3 min-h-0">
+        <div class="flex items-center justify-between mb-2 border-b-4 border-black pb-1">
+            <h2 class="font-pixel text-xl uppercase truncate max-w-[70%]">
+                {{ hallplats_namn | default('CONN_LINK') }}
+            </h2>
+            <span class="bg-black text-white px-2 font-pixel text-xs py-1 animate-pulse">LIVE</span>
+        </div>
+
+        <div id="bus-list" class="flex-1 flex flex-col gap-2 overflow-hidden">
+            {% if avgangar %}
+                {% for bus in avgangar[:3] %}
+                <div class="flex items-center bg-gray-100 border-2 border-black p-1">
+                    <div class="w-12 h-10 bg-black text-white flex items-center justify-center font-pixel text-xl mr-2">
+                        {{ bus.line }}
+                    </div>
+                    
+                    <div class="flex-1 min-w-0 flex flex-col justify-center h-full">
+                        <span class="text-xs text-gray-500 leading-none">DESTINATION:</span>
+                        <span class="text-2xl leading-none truncate uppercase">{{ bus.destination }}</span>
+                    </div>
+
+                    <div class="w-auto text-right pl-2 border-l-2 border-black border-dotted">
+                        <span class="font-pixel text-xl block">{{ bus.next }}</span>
+                        <span class="text-sm block text-gray-500">>> {{ bus.later }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="flex-1 flex items-center justify-center flex-col">
+                    <span class="font-pixel text-lg">NO_DATA_FOUND</span>
+                    <span class="text-sm blink">_</span>
+                </div>
+            {% endif %}
+        </div>
+    </section>
+
+    <script>
+        window.onload = function() {
+            if (window.lucide) { lucide.createIcons(); } 
+            else { setTimeout(() => { if (window.lucide) lucide.createIcons(); }, 500); }
+        };
+
+        const daysFromPython = {{ kalender_dagar | tojson }};
+
+        function renderCalendar() {
+            const headerContainer = document.getElementById('calendar-header');
+            const columnsContainer = document.getElementById('calendar-columns');
+            const startHour = 6;
+            const totalHours = 18; 
+            
+            function getTopPercent(hour) {
+                if (!hour) return 0;
+                if (hour < startHour) return 0; 
+                if (hour > 24) return 100;     
+                return ((hour - startHour) / totalHours) * 100;
+            }
+
+            let headerHtml = '';
+            let columnsHtml = '';
+
+            daysFromPython.forEach((dayData) => {
+                const isToday = dayData.is_today;
+                const widthClass = isToday ? 'w-2/5' : 'flex-1'; 
+                
+                // Header: Today gets a black box
+                const headerStyle = isToday 
+                    ? 'bg-black text-white font-bold' 
+                    : 'bg-white text-black border-r-2 border-black border-dotted';
+                
+                headerHtml += `
+                    <div class="${widthClass} h-full flex items-center justify-center text-xl leading-none ${headerStyle}">
+                        ${dayData.namn}
+                    </div>
+                `;
+
+                let dayEventsHtml = '';
+                
+                // HÄR ÄR ÄNDRINGEN: Vi loopar 'events' istället för 'event'
+                if (dayData.events && dayData.events.length > 0) {
+                    dayData.events.forEach((evt) => {
+                        const start = evt.start || 8; 
+                        const end = evt.end || 9;
+                        const top = getTopPercent(start);
+                        let height = ((end - start) / totalHours) * 100;
+                        if (height < 5) height = 5; 
+
+                        // Events: Hard pixel borders. 
+                        // Today = Black hashed pattern. Others = White with border.
+                        if (isToday) {
+                            dayEventsHtml += `
+                                <div class="absolute w-full z-20 px-0.5" style="top: ${top}%; height: ${height}%;">
+                                    <div class="w-full h-full border-2 border-black bg-black flex items-center justify-center overflow-hidden">
+                                        <span class="text-white text-lg leading-none text-center px-1 font-bold truncate">${evt.name}</span>
+                                    </div>
+                                </div>
+                            `;
+                        } else {
+                            dayEventsHtml += `
+                                <div class="absolute w-full z-10 px-0.5" style="top: ${top}%; height: ${height}%;">
+                                    <div class="w-full h-full border-2 border-black bg-[url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAIklEQVQIW2NkQAKrVq36zwjjgzhhZWGMYAEYB8RmROaABADeOQ8CXl/xfgAAAABJRU5ErkJggg==')]" title="${evt.name}"></div>
+                                </div>
+                            `;
+                        }
+                    });
+                }
+
+                columnsHtml += `
+                    <div class="${widthClass} relative h-full border-r-2 border-black border-dotted last:border-0">
+                        ${dayEventsHtml}
+                    </div>
+                `;
+            });
+
+            headerContainer.innerHTML = headerHtml;
+            columnsContainer.innerHTML = columnsHtml;
+        }
+
+        if (daysFromPython && daysFromPython.length > 0) renderCalendar();
+    </script>
+</body>
+</html>

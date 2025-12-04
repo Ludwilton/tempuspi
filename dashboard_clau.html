@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=480, height=800, initial-scale=1.0">
+    <title>Dashboard — Information as Architecture</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* 2025 DESIGN SYSTEM */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        html, body {
+            width: 480px;
+            height: 800px;
+            overflow: hidden;
+            background: #FAFAFA;
+            color: #0A0A0A;
+            font-family: 'Inter', -apple-system, sans-serif;
+            font-feature-settings: 'cv08', 'cv11', 'ss01';
+            -webkit-font-smoothing: antialiased;
+            text-rendering: optimizeLegibility;
+        }
+        
+        .mono { 
+            font-family: 'JetBrains Mono', monospace; 
+            font-feature-settings: 'zero';
+        }
+        
+        /* BRUTALIST GRID SYSTEM */
+        .grid-main {
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            height: 100vh;
+            padding: 24px;
+            gap: 32px;
+        }
+        
+        /* TYPOGRAPHY SCALE - ARCHITECTURAL */
+        .type-hero { 
+            font-size: 88px; 
+            font-weight: 200; 
+            letter-spacing: -0.06em; 
+            line-height: 0.85;
+        }
+        .type-display { 
+            font-size: 56px; 
+            font-weight: 300; 
+            letter-spacing: -0.04em; 
+        }
+        .type-headline { 
+            font-size: 13px; 
+            font-weight: 600; 
+            letter-spacing: 0.08em; 
+            text-transform: uppercase;
+        }
+        .type-body { 
+            font-size: 15px; 
+            font-weight: 400; 
+            letter-spacing: -0.01em; 
+        }
+        .type-caption { 
+            font-size: 11px; 
+            font-weight: 500; 
+            letter-spacing: 0.04em;
+        }
+        .type-micro { 
+            font-size: 9px; 
+            font-weight: 600; 
+            letter-spacing: 0.1em;
+        }
+        
+        /* ACCENT SYSTEM - NOW */
+        .accent-primary { color: #0A0A0A; }
+        .accent-now { 
+            background: #0A0A0A; 
+            color: #FAFAFA;
+        }
+        
+        /* CALENDAR - MUSICAL NOTATION */
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 6px;
+            height: 100%;
+        }
+        
+        .calendar-day {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            background: #F0F0F0;
+            border-radius: 3px;
+            padding: 8px 4px;
+        }
+        
+        .calendar-day.today {
+            background: #E8E8E8;
+            box-shadow: inset 0 0 0 2px #0A0A0A;
+        }
+        
+        .calendar-label {
+            text-align: center;
+            margin-bottom: 6px;
+            opacity: 0.5;
+        }
+        
+        .calendar-day.today .calendar-label {
+            opacity: 1;
+            font-weight: 700;
+        }
+        
+        .calendar-events {
+            position: relative;
+            flex: 1;
+        }
+        
+        .calendar-event {
+            position: absolute;
+            left: 2px;
+            right: 2px;
+            background: #0A0A0A;
+            border-radius: 2px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2px;
+        }
+        
+        .calendar-day.today .calendar-event {
+            background: #FAFAFA;
+            border: 2px solid #0A0A0A;
+        }
+        
+        .event-text {
+            font-size: 8px;
+            font-weight: 700;
+            text-align: center;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            line-height: 1.1;
+            max-width: 100%;
+        }
+        
+        /* TRANSIT - BOLD GRAPHIC */
+        .transit-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .transit-item {
+            display: grid;
+            grid-template-columns: 36px 1fr auto;
+            gap: 12px;
+            align-items: center;
+            padding: 12px;
+            background: #F0F0F0;
+            border-radius: 4px;
+            position: relative;
+        }
+        
+        .transit-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: #0A0A0A;
+        }
+        
+        .transit-line {
+            width: 36px;
+            height: 36px;
+            background: #0A0A0A;
+            color: #FAFAFA;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 16px;
+            letter-spacing: -0.02em;
+            border-radius: 2px;
+        }
+        
+        .transit-time {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            line-height: 1;
+        }
+        
+        .transit-time-next {
+            font-size: 11px;
+            font-weight: 500;
+            color: #666;
+            margin-left: 6px;
+        }
+        
+        /* WEATHER - ICONIC */
+        .weather-icon {
+            width: 48px;
+            height: 48px;
+            stroke-width: 1.5;
+        }
+        
+        .temp-display {
+            font-size: 56px;
+            font-weight: 200;
+            letter-spacing: -0.04em;
+            line-height: 1;
+        }
+        
+        /* STATUS BADGE */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            background: #0A0A0A;
+            color: #FAFAFA;
+            border-radius: 2px;
+        }
+        
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            background: #FAFAFA;
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+    </style>
+</head>
+<body>
+    <div class="grid-main">
+        
+        <!-- PENTHOUSE: TIME & CONTEXT -->
+        <header>
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
+                <!-- Date Badge -->
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <div class="type-caption accent-primary mono">{{ datum_dag }}</div>
+                    <div class="type-caption" style="color: #666;">{{ datum_manad }}</div>
+                </div>
+                
+                <!-- Location -->
+                <div class="type-micro mono" style="color: #999;">GBG</div>
+            </div>
+            
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <!-- Hero Time -->
+                <div>
+                    <div class="type-hero mono">{{ klockslag }}</div>
+                    <div class="status-badge type-micro mono" style="margin-top: 8px;">
+                        <div class="status-dot"></div>
+                        <span>LIVE</span>
+                    </div>
+                </div>
+                
+                <!-- Weather -->
+                <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 8px;">
+                    <i data-lucide="{{ vader_ikon }}" class="weather-icon"></i>
+                    <div class="temp-display">{{ vader_temp }}°</div>
+                </div>
+            </div>
+        </header>
+        
+        <!-- LIVING SPACE: CALENDAR -->
+        <section style="min-height: 0;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <h2 class="type-headline accent-primary">Denna Vecka</h2>
+                <div class="type-micro mono" style="color: #999;">V.{{ kalender_dagar[0].vecka if kalender_dagar else 'XX' }}</div>
+            </div>
+            
+            <div class="calendar-grid">
+                {% if kalender_dagar %}
+                    {% for day in kalender_dagar %}
+                    <div class="calendar-day {{ 'today' if day.is_today else '' }}">
+                        <div class="calendar-label type-micro mono">{{ day.namn }}</div>
+                        
+                        <div class="calendar-events">
+                            {% for event in day.events %}
+                                {% set start_pct = ((event.start - 6) / 18 * 100) if event.start else 20 %}
+                                {% set height_pct = ((event.end - event.start) / 18 * 100) if (event.end and event.start) else 15 %}
+                                {% set show_text = height_pct > 12 %}
+                                
+                                <div class="calendar-event" 
+                                     style="top: {{ start_pct }}%; height: max({{ height_pct }}%, 10px);"
+                                     title="{{ event.name }}">
+                                    {% if show_text %}
+                                    <div class="event-text" style="
+                                        display: -webkit-box;
+                                        -webkit-box-orient: vertical;
+                                        -webkit-line-clamp: {{ (height_pct / 6)|int }};
+                                        overflow: hidden;
+                                    ">{{ event.name }}</div>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div style="grid-column: 1 / -1; display: flex; align-items: center; justify-content: center;">
+                        <div class="type-caption mono" style="color: #999;">INGEN DATA</div>
+                    </div>
+                {% endif %}
+            </div>
+        </section>
+        
+        <!-- GROUND FLOOR: TRANSIT -->
+        <footer>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <h2 class="type-headline accent-primary">{{ hallplats_namn | default('Transit') }}</h2>
+                <div class="type-micro mono" style="color: #999;">NÄSTA</div>
+            </div>
+            
+            <div class="transit-list">
+                {% if avgangar %}
+                    {% for bus in avgangar[:3] %}
+                    <div class="transit-item">
+                        <div class="transit-line">{{ bus.line }}</div>
+                        
+                        <div class="type-body" style="font-weight: 500;">
+                            {{ bus.destination }}
+                        </div>
+                        
+                        <div style="text-align: right;">
+                            <span class="transit-time mono">{{ bus.next }}</span>
+                            <span class="transit-time-next mono">{{ bus.later }}</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div style="padding: 24px; text-align: center; background: #F0F0F0; border-radius: 4px;">
+                        <div class="type-caption mono" style="color: #999;">INGEN AVGÅNGSDATA</div>
+                    </div>
+                {% endif %}
+            </div>
+        </footer>
+        
+    </div>
+
+    <script>
+        // Lucide Icons
+        window.onload = function() {
+            if (window.lucide) { 
+                lucide.createIcons(); 
+            } else { 
+                setTimeout(() => { 
+                    if (window.lucide) lucide.createIcons(); 
+                }, 500); 
+            }
+        };
+    </script>
+</body>
+</html>

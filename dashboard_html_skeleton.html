@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=480, height=800, initial-scale=1.0">
+    <title>Dashboard Template</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        body {
+            width: 480px;
+            height: 800px;
+            overflow: hidden;
+            background: white;
+            color: black;
+        }
+        /* Hjälpklass för att se boxarna när du designar (ta bort sen) */
+        .debug-border { border: 1px dashed #ccc; }
+    </style>
+</head>
+<body class="flex flex-col">
+
+    <div class="debug-border p-2">
+        <div>{{ datum_dag }} {{ datum_manad }}</div>
+        
+        <div>{{ klockslag }}</div>
+        
+        <div class="flex items-center gap-2">
+            <i data-lucide="{{ vader_ikon }}" class="w-6 h-6"></i>
+            <span>{{ vader_temp }}°</span>
+        </div>
+    </div>
+
+    <div class="flex-1 debug-border p-2 flex flex-col">
+        <div>Kalender</div>
+        
+        <div class="flex h-full w-full relative">
+            {% if kalender_dagar %}
+                {% for day in kalender_dagar %}
+                
+                <div class="flex-1 relative border-r border-gray-200 h-full">
+                    <div class="text-center text-xs">{{ day.namn }}</div>
+                    
+                    {% if day.events %}
+                        {% for event in day.events %}
+                            {% set start_pct = ((event.start - 6) / 18 * 100) if event.start else 0 %}
+                            {% set duration = (event.end - event.start) if (event.end and event.start) else 1 %}
+                            {% set height_pct = (duration / 18 * 100) %}
+                            
+                            <div class="absolute w-full bg-gray-300 text-[9px] overflow-hidden"
+                                 style="top: {{ start_pct }}%; height: {{ height_pct }}%;"
+                                 title="{{ event.name }}">
+                                {{ event.name }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+                {% endfor %}
+            {% else %}
+                <div>Ingen data</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="debug-border p-2">
+        <div>{{ hallplats_namn | default('Hållplats') }}</div>
+        
+        <div class="flex flex-col gap-1">
+            {% if avgangar %}
+                {% for bus in avgangar[:4] %}
+                <div class="flex justify-between items-center">
+                    <div class="flex gap-2">
+                        <span class="font-bold">{{ bus.line }}</span>
+                        <span>{{ bus.destination }}</span>
+                    </div>
+                    
+                    <div class="text-right">
+                        <span>{{ bus.next }}</span>
+                        <span class="text-xs text-gray-500">({{ bus.later }})</span>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div>Inga avgångar</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        window.onload = function() {
+            if (window.lucide) { lucide.createIcons(); } 
+            else { setTimeout(() => { if (window.lucide) lucide.createIcons(); }, 500); }
+        };
+    </script>
+</body>
+</html>
