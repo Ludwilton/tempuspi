@@ -3,14 +3,24 @@ import os
 import time
 import datetime
 import traceback
+import subprocess  # <--- Ny import för att köra shell-kommandon
 from PIL import Image
 from jinja2 import Environment, FileSystemLoader
-from html2image import Html2Image
 from dotenv import load_dotenv
 from fetch_departure_info import extract_board_data
 from fetch_calendar import get_calendar_events
 from fetch_weather import fetch_weather_data
+import shutil
 
+# Kolla om "chromium-browser" finns i systemet (dvs om vi är på Pi)
+CHROME_COMMAND = "chromium-headless-shell"
+# Annars är vi nog på Windows (din dev-dator)
+#else:
+    # Här måste du fortfarande ha hela sökvägen om du inte lagt till den i Windows PATH
+    #CHROME_COMMAND = r"C:/Users/ludwi/Desktop/repos/chrome-headless-shell-win64/chrome-headless-shell.exe"
+    
+DISPLAY_WIDTH = 480
+DISPLAY_HEIGHT = 800
 
 # Justera import efter din skärmmodell
 # try:
@@ -31,7 +41,6 @@ DATA_FETCH_INTERVAL = 300
 def prepare_calendar_data(events):
     """
     Skapar en fast Mån-Sön vy för nuvarande vecka.
-    Mappar ALLA ICS-events till strukturen som dashboard.html förväntar sig.
     """
     week_view = []
     now = datetime.datetime.now()
@@ -46,7 +55,7 @@ def prepare_calendar_data(events):
         
         day_struct = {
             'namn': dagar_korta[i],
-            'events': [],  # NU EN LISTA istället för single event
+            'events': [],
             'is_today': (target_date == today_date)
         }
         
@@ -66,7 +75,6 @@ def prepare_calendar_data(events):
                             'start': local_start.hour + (local_start.minute / 60.0),
                             'end': local_end.hour + (local_end.minute / 60.0)
                         })
-                        # TA BORT break här så vi fortsätter leta efter fler events!
                         
                 except Exception as err:
                     print(f"Kunde inte läsa eventdata för {getattr(e, 'name', 'okänt')}: {err}")
@@ -77,43 +85,65 @@ def prepare_calendar_data(events):
 
 def get_icon_name(symbol_code, hour):
     """
-    Mappar väderkoder till Lucide-ikoner, med stöd för natt-ikoner.
+    Mappar väderkoder till Lucide-ikoner.
     """
     try:
         code = int(symbol_code)
     except (ValueError, TypeError):
         return "cloud"
-
-    # Definiera vad som är natt (t.ex. före 06:00 eller efter 21:00)
-    # Du kan justera tiderna här
     is_night = (hour >= 21 or hour < 6)
-
-    # --- KLART & HALVKLART (Här byter vi ikon på natten) ---
     if code == 1: 
-        return "moon" if is_night else "sun"  # Måne eller Sol
-        
+        return "moon" if is_night else "sun"
     if code in [2, 3]: 
-        return "cloud-moon" if is_night else "cloud-sun" # Moln+Måne eller Moln+Sol
-
-    # --- ÖVRIGA (Regn/Snö/Dimma ser oftast likadana ut natt som dag) ---
+        return "cloud-moon" if is_night else "cloud-sun"
     if code in [4, 5, 6]: return "cloud"
     if code == 7: return "cloud-fog"
-    
-    # Regn
     if code in [8, 18]: return "cloud-drizzle"
     if code in [9, 10, 19, 20]: return "cloud-rain"
-
-    # Åska
     if code in [11, 21]: return "cloud-lightning"
-
-    # Snöblandat
     if code in [12, 13, 14, 22, 23, 24]: return "cloud-hail"
-
-    # Snö
     if code in [15, 16, 17, 25, 26, 27]: return "snowflake"
 
     return "cloud"
+def take_screenshot(html_file_path, output_file_path):
+    try:
+        # På Windows behöver vi ofta 'file:///', på Linux räcker oftast sökvägen men detta skadar inte
+        abs_html_path = os.path.abspath(html_file_path)
+        target_url = f"file:///{abs_html_path}"
 
+
+        command = [
+            CHROME_COMMAND,
+            target_url,
+            "--headless",
+            f"--screenshot={output_file_path}",
+            f"--window-size={DISPLAY_WIDTH},{DISPLAY_HEIGHT}",
+            "--hide-scrollbars",
+            "--disable-dev-shm-usage",
+            "--disable-gpu",
+            "--use-gl=swiftshader",
+            "--in-process-gpu",
+            "--js-flags=--jitless",
+            "--disable-zero-copy",
+            "--disable-extensions",
+            "--disable-plugins",
+            "--disable-gpu-memory-buffer-compositor-resources",
+            "--mute-audio",
+            "--no-sandbox",
+        ]
+        
+        result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        
+        if result.returncode != 0:
+            print(f"Fel vid screenshot: {result.stderr.decode('utf-8')}")
+            return False
+            
+        return True
+        
+    except Exception as e:
+        print(f"Kunde inte ta screenshot: {e}")
+        return False
+    
 def main():
     if epd_driver:
         epd = epd_driver.EPD()
@@ -126,21 +156,7 @@ def main():
     env = Environment(loader=file_loader)
     template = env.get_template('dashboard.html')
     
-    # På Raspberry Pi brukar sökvägen vara:
-    # browser_executable='/usr/bin/chromium-browser'
-    hti = Html2Image(
-        size=(480, 800),browser_executable="C:/Users/ludwi/Desktop/repos/chrome-headless-shell-win64/chrome-headless-shell.exe",
-        custom_flags=[
-            '--force-device-scale-factor=1', 
-            '--hide-scrollbars',
-            '--disable-gpu',
-            '--no-sandbox',
-            '--virtual-time-budget=3000'  # Add 2 second delay for rendering
-        ]
-    )
-    # Fix for Chrome 128+ compatibility
-#
-    
+    # Init variabler
     cached_departures = []
     cached_events = []
     cached_weather = {'temp': '--', 'symbol': 'na'}
@@ -150,19 +166,17 @@ def main():
         while True:
             now = datetime.datetime.now()
             
-            # --- 1. Hämta bussdata ---
+            # --- 1. Hämta bussdata (varje loop) ---
             print("Hämtar bussdata...")
             try:
-                # OBS: Nu packar vi upp TVÅ värden från funktionen
                 cached_departures, cached_stop_name = extract_board_data(
                     stop_area_gid=STOP_AREA_GID, 
-                    filter_platforms= ['A'] # Eller ta bort filtret om du vill se allt
+                    filter_platforms=['A']
                 )
             except Exception as e: 
                 print(f"Avgångsfel: {e}")
 
-            # --- 2. Hämta data som ändras sällan (Väder & Kalender) ---
-            # Detta körs var 5:e minut (DATA_FETCH_INTERVAL)
+            # --- 2. Hämta långsam data (Väder & Kalender) ---
             if time.time() - last_data_fetch > DATA_FETCH_INTERVAL or last_data_fetch == 0:
                 print("Hämtar väder och kalender...")
 
@@ -185,6 +199,7 @@ def main():
             manad_namn = f"{now.day} {manader_sv[now.month-1]}"
             sym_kod = cached_weather.get('symbol', '1')
             ikon_namn = get_icon_name(sym_kod, now.hour)
+            
             print(f"Renderar HTML ({now.strftime('%H:%M')})...")
 
             html_content = template.render(
@@ -199,33 +214,36 @@ def main():
                 avgangar=cached_departures
             )
 
-            with open("renderad_sida.html", "w", encoding='utf-8') as f:
+            html_filename = "renderad_sida.html"
+            image_filename = "display_buffer.png"
+
+            with open(html_filename, "w", encoding='utf-8') as f:
                 f.write(html_content)
             
-            hti.screenshot(html_file='renderad_sida.html', save_as='display_buffer.png')
-            time.sleep(0.5)
-            img = Image.open('display_buffer.png')
-            # img = img.rotate(90, expand=True) # Avkommentera om skärmen sitter roterad
-            img_bw = img.convert("1")
+            success = take_screenshot(html_filename, image_filename)
+            
+            if success and os.path.exists(image_filename):
+                img = Image.open(image_filename)
+                
+                img_bw = img.convert("1")
 
-            # --- 4. Uppdatera skärmen ---
-            if epd:
-                buffer = epd.getbuffer(img_bw)
-                
-                # Full refresh vid hel timme (minskar ghosting)
-                # Även bra att göra en full refresh vid midnatt (00:00) eller 03:00
-                if now.minute == 0 and now.second < 10:
-                    print("Full refresh...")
-                    epd.init()
-                    epd.display(buffer)
+                if epd:
+                    buffer = epd.getbuffer(img_bw)
+                    
+                    if now.minute == 0 and now.second < 10:
+                        print("Full refresh...")
+                        epd.init()
+                        epd.display(buffer)
+                    else:
+                        print("Partial refresh...")
+                        epd.init_part()
+                        epd.display_Partial(buffer)
+                    
+                    epd.sleep()
                 else:
-                    print("Partial refresh...")
-                    epd.init_part()
-                    epd.display_Partial(buffer)
-                
-                epd.sleep()
+                    print(f"Simulering klar: {len(cached_departures)} bussar hittades. Bild sparad som {image_filename}")
             else:
-                print(f"Simulering klar: {len(cached_departures)} bussar hittades.")
+                print("Kunde inte generera bild, hoppar över skärmuppdatering.")
 
             seconds_to_sleep = 60 - datetime.datetime.now().second
             time.sleep(seconds_to_sleep + 1) 
