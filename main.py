@@ -3,39 +3,33 @@ import os
 import time
 import datetime
 import traceback
-import subprocess  # <--- Ny import för att köra shell-kommandon
+import subprocess
 from PIL import Image
 from jinja2 import Environment, FileSystemLoader
 from dotenv import load_dotenv
 from fetch_departure_info import extract_board_data
 from fetch_calendar import get_calendar_events
 from fetch_weather import fetch_weather_data
-import shutil
+from fetch_spotify import get_spotify_data
 
-# Kolla om "chromium-browser" finns i systemet (dvs om vi är på Pi)
+
+# PI:
+from waveshare_epd import epd7in5_V2 as epd_driver
 CHROME_COMMAND = "chromium-headless-shell"
-# Annars är vi nog på Windows (din dev-dator)
-#else:
-    # Här måste du fortfarande ha hela sökvägen om du inte lagt till den i Windows PATH
-    #CHROME_COMMAND = r"C:/Users/ludwi/Desktop/repos/chrome-headless-shell-win64/chrome-headless-shell.exe"
+
+# Windows debug 
+# CHROME_COMMAND = r"C:/Users/ludwi/Desktop/repos/chrome-headless-shell-win64/chrome-headless-shell.exe"
+# epd_driver = None
     
 DISPLAY_WIDTH = 480
 DISPLAY_HEIGHT = 800
-
-# Justera import efter din skärmmodell
-# try:
-#     from waveshare_epd import epd7in5_V2 as epd_driver
-# except ImportError:
-#     epd_driver = None
-
-epd_driver = None
 
 load_dotenv()
 STOP_AREA_GID = os.environ.get("STOP_AREA_GID")
 ICS_URL = os.environ.get("ICS_URL")
 LONGITUDE = os.environ.get("LONGITUDE")
 LATITUDE = os.environ.get("LATITUDE")
-
+platform = os.environ.get("DEPARTURE_PLATFORM")
 DATA_FETCH_INTERVAL = 300 
 
 def prepare_calendar_data(events):
@@ -105,6 +99,8 @@ def get_icon_name(symbol_code, hour):
     if code in [15, 16, 17, 25, 26, 27]: return "snowflake"
 
     return "cloud"
+
+
 def take_screenshot(html_file_path, output_file_path):
     try:
         # På Windows behöver vi ofta 'file:///', på Linux räcker oftast sökvägen men detta skadar inte
@@ -144,6 +140,7 @@ def take_screenshot(html_file_path, output_file_path):
         print(f"Kunde inte ta screenshot: {e}")
         return False
     
+    
 def main():
     if epd_driver:
         epd = epd_driver.EPD()
@@ -165,18 +162,15 @@ def main():
     try:
         while True:
             now = datetime.datetime.now()
-            
-            # --- 1. Hämta bussdata (varje loop) ---
             print("Hämtar bussdata...")
             try:
                 cached_departures, cached_stop_name = extract_board_data(
                     stop_area_gid=STOP_AREA_GID, 
-                    filter_platforms=['A']
+                    filter_platforms=platform
                 )
             except Exception as e: 
                 print(f"Avgångsfel: {e}")
 
-            # --- 2. Hämta långsam data (Väder & Kalender) ---
             if time.time() - last_data_fetch > DATA_FETCH_INTERVAL or last_data_fetch == 0:
                 print("Hämtar väder och kalender...")
 
@@ -191,17 +185,35 @@ def main():
                 last_data_fetch = time.time()
 
             calendar_view = prepare_calendar_data(cached_events)
-            
             dagar_sv = ["Måndag", "Tisdag", "Onsdag", "Torsdag", "Fredag", "Lördag", "Söndag"]
             manader_sv = ["Jan", "Feb", "Mar", "Apr", "Maj", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dec"]
-            
             dag_namn = dagar_sv[now.weekday()]
             manad_namn = f"{now.day} {manader_sv[now.month-1]}"
             sym_kod = cached_weather.get('symbol', '1')
             ikon_namn = get_icon_name(sym_kod, now.hour)
             
+            print("Hämtar Spotify...")
+            try:
+                spotify_status = get_spotify_data()
+            except Exception as e:
+                print(f"Kunde inte hämta Spotify: {e}")
+                spotify_status = None
+                
+            
             print(f"Renderar HTML ({now.strftime('%H:%M')})...")
-
+            raw_data = {"hallplats_namn": cached_stop_name, 
+                        "datum_dag": dag_namn,
+                        "datum_manad": manad_namn,
+                        "klockslag": now.strftime("%H:%M"),
+                        "vader_temp": cached_weather.get('temp', '--'),
+                        "vader_symbol": cached_weather.get('symbol', '1'),
+                        "vader_ikon": ikon_namn,
+                        "kalender_dagar": calendar_view,
+                        "avgangar": cached_departures,
+                        "spotify": spotify_status}
+            print("raw data: ")
+            print(raw_data)
+            
             html_content = template.render(
                 hallplats_namn=cached_stop_name,
                 datum_dag=dag_namn,
@@ -211,7 +223,8 @@ def main():
                 vader_symbol=cached_weather.get('symbol', '1'),
                 vader_ikon=ikon_namn,
                 kalender_dagar=calendar_view,
-                avgangar=cached_departures
+                avgangar=cached_departures,
+                spotify=spotify_status
             )
 
             html_filename = "renderad_sida.html"

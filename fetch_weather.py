@@ -19,9 +19,7 @@ def fetch_weather_data(lat,lon):
     
     return {"temp": temp, "symbol": symbol}
     
-weather=fetch_weather_data(lat=LATITUDE, lon=LONGITUDE)
-print(weather)
-
+# weather=fetch_weather_data(lat=LATITUDE, lon=LONGITUDE)
 
 """
 1	Klart	Himlen är fri från moln

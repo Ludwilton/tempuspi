@@ -37,7 +37,7 @@
 </head>
 <body class="flex flex-col border-[6px] border-black box-border">
 
-    <header class="flex flex-col shrink-0 h-[160px]">
+    <header class="flex flex-col shrink-0 h-[200px]">
         
         <div class="flex h-[40px] b-b">
             <div class="inverted flex-1 flex items-center px-2 text-sm font-bold uppercase tracking-widest">
@@ -47,22 +47,58 @@
                 SYS.RDY // 2025
             </div>
         </div>
+<div class="flex flex-1 items-center justify-between px-3 py-2">
 
-        <div class="flex flex-1 items-center justify-between px-2">
-            <div class="font-display text-[5.5rem] leading-none tracking-tighter -ml-1">
+    {% if spotify and spotify.is_playing %}
+
+        <!-- ==================== MUSIK SPELAS ==================== -->
+        <div class="flex flex-col justify-center">
+            <!-- STÖRRE KLOCKA NÄR MUSIK SPELAS -->
+            <div class="font-display text-[4.5rem] leading-none tracking-tighter">
                 {{ klockslag }}
             </div>
-            
-            <div class="flex flex-col items-end justify-center h-full pl-4">
-                <div class="flex items-center">
-                    <span class="font-display text-4xl mr-2">{{ vader_temp }}°</span>
-                    <i data-lucide="{{ vader_ikon }}" class="w-8 h-8 stroke-[3]"></i>
-                </div>
-                <div class="text-xs font-bold uppercase tracking-widest mt-1 border-t-2 border-black pt-1 w-full text-right">
-                    GBG_SE
-                </div>
+
+            <!-- VÄDER UNDER KLOCKAN -->
+            <div class="flex items-center mt-2">
+                <span class="font-display text-3xl mr-2">{{ vader_temp }}°</span>
+                <i data-lucide="{{ vader_ikon }}" class="w-8 h-8 stroke-[3]"></i>
             </div>
         </div>
+
+        <!-- MUSIKINFO TILL HÖGER - STÖRRE -->
+        <div class="flex flex-1 items-center justify-end min-w-0 pl-2">
+            
+            <div class="flex flex-col text-right mr-3 min-w-0">
+                <span class="text-xl font-bold uppercase line-clamp-3 leading-none break-words">{{ spotify.track }}</span>
+                <span class="text-sm truncate mt-1 font-bold">{{ spotify.artist }}</span>
+                <span class="text-xs text-gray-600 truncate mt-0.5">{{ spotify.album }}</span>
+            </div>
+
+            <img src="{{ spotify.image }}" class="w-24 h-24 border-3 border-black object-cover shrink-0">
+
+        </div>
+
+    {% else %}
+
+        <!-- ==================== INGEN MUSIK – STÖRRE LAYOUT ==================== -->
+        <div class="font-display text-[6.5rem] leading-none tracking-tighter -ml-1">
+            {{ klockslag }}
+        </div>
+                
+        <div class="flex flex-col items-end justify-center h-full pl-4">
+            <div class="flex items-center">
+                <span class="font-display text-5xl mr-3">{{ vader_temp }}°</span>
+                <i data-lucide="{{ vader_ikon }}" class="w-10 h-10 stroke-[3]"></i>
+            </div>
+            <div class="text-sm font-bold uppercase tracking-widest mt-2 border-t-2 border-black pt-1 w-full text-right">
+                GBG_SE
+            </div>
+        </div>
+
+    {% endif %}
+
+</div>
+
     </header>
 
     <div class="h-[30px] b-t b-b flex items-center px-2 bg-gray-100">
@@ -98,7 +134,7 @@
     <section class="flex-col bg-white w-full flex-1 overflow-hidden flex pb-0 min-h-0">
         <div id="bus-list" class="flex flex-col w-full">
             {% if avgangar %}
-                {% for bus in avgangar[:4] %}
+                {% for bus in avgangar[:3] %}
                 
                 <div class="flex items-center border-b-2 border-black px-2 h-[60px] shrink-0 w-full hover:bg-gray-100">
                     
