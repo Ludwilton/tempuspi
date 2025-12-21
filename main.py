@@ -30,7 +30,8 @@ ICS_URL = os.environ.get("ICS_URL")
 LONGITUDE = os.environ.get("LONGITUDE")
 LATITUDE = os.environ.get("LATITUDE")
 platform = os.environ.get("DEPARTURE_PLATFORM")
-DATA_FETCH_INTERVAL = 300 
+DATA_FETCH_INTERVAL = 300
+CALENDAR_FETCH_INTERVAL = 3600
 
 
 NIGHT_MODE_START = 3
@@ -203,6 +204,7 @@ def main():
     cached_events = []
     cached_weather = {'temp': '--', 'symbol': 'na'}
     last_data_fetch = 0
+    last_calendar_fetch = 0
     
     try:
         while True:
@@ -223,23 +225,28 @@ def main():
                     stop_area_gid=STOP_AREA_GID, 
                     filter_platforms=platform
                 )
-                print(f"⏱️  Bussdata: {time.time()-start:.1f}s")
+                print(f"Bussdata: {time.time()-start:.1f}s")
             except Exception as e: 
                 print(f"Avgångsfel: {e}")
 
-            if time.time() - last_data_fetch > DATA_FETCH_INTERVAL or last_data_fetch == 0:
+            if time.time() - last_calendar_fetch > CALENDAR_FETCH_INTERVAL or last_calendar_fetch == 0:
                 start = time.time()
-                print("Hämtar väder och kalender...")
-
+                print("Hämtar kalender...")
                 try:
                     cached_events = get_calendar_events(ICS_URL)
-                except Exception as e: print(f"Kalenderfel: {e}")
+                    print(f"Kalender: {time.time()-start:.1f}s")
+                except Exception as e: 
+                    print(f"Kalenderfel: {e}")
+                last_calendar_fetch = time.time()
 
+            if time.time() - last_data_fetch > DATA_FETCH_INTERVAL or last_data_fetch == 0:
+                start = time.time()
+                print("Hämtar väder...")
                 try:
                     cached_weather = fetch_weather_data(lat=LATITUDE, lon=LONGITUDE)
-                except Exception as e: print(f"Väderfel: {e}")
-                
-                print(f"Väder+Kalender: {time.time()-start:.1f}s")
+                    print(f"Väder: {time.time()-start:.1f}s")
+                except Exception as e: 
+                    print(f"Väderfel: {e}")
                 last_data_fetch = time.time()
 
             start = time.time()
