@@ -32,6 +32,11 @@ LATITUDE = os.environ.get("LATITUDE")
 platform = os.environ.get("DEPARTURE_PLATFORM")
 DATA_FETCH_INTERVAL = 300 
 
+# Nattläge-inställningar
+NIGHT_MODE_START = 3   # Klockan 02:00
+NIGHT_MODE_END = 5     # Klockan 05:00
+NIGHT_MODE_SLEEP = 300  # 5 minuter mellan uppdateringar på natten
+
 def prepare_calendar_data(events):
     """
     Skapar en fast Mån-Sön vy för nuvarande vecka.
@@ -103,10 +108,8 @@ def get_icon_name(symbol_code, hour):
 
 def take_screenshot(html_file_path, output_file_path):
     try:
-        # På Windows behöver vi ofta 'file:///', på Linux räcker oftast sökvägen men detta skadar inte
         abs_html_path = os.path.abspath(html_file_path)
         target_url = f"file:///{abs_html_path}"
-
 
         command = [
             CHROME_COMMAND,
@@ -139,7 +142,12 @@ def take_screenshot(html_file_path, output_file_path):
     except Exception as e:
         print(f"Kunde inte ta screenshot: {e}")
         return False
-    
+
+
+def is_night_mode(current_hour):
+    """Kollar om vi är i nattläge (02:00 - 05:00)"""
+    return NIGHT_MODE_START <= current_hour < NIGHT_MODE_END
+
     
 def main():
     if epd_driver:
@@ -162,7 +170,16 @@ def main():
     try:
         while True:
             now = datetime.datetime.now()
-            print("Hämtar bussdata...")
+            
+            # Nattläge: hoppa över uppdatering och sov längre
+            if is_night_mode(now.hour):
+                print(f"[{now.strftime('%H:%M')}] Nattläge - sover i {NIGHT_MODE_SLEEP}s...")
+                if epd:
+                    epd.sleep()
+                time.sleep(NIGHT_MODE_SLEEP)
+                continue
+            
+            print(f"[{now.strftime('%H:%M')}] Hämtar bussdata...")
             try:
                 cached_departures, cached_stop_name = extract_board_data(
                     stop_area_gid=STOP_AREA_GID, 
@@ -201,18 +218,6 @@ def main():
                 
             
             print(f"Renderar HTML ({now.strftime('%H:%M')})...")
-            raw_data = {"hallplats_namn": cached_stop_name, 
-                        "datum_dag": dag_namn,
-                        "datum_manad": manad_namn,
-                        "klockslag": now.strftime("%H:%M"),
-                        "vader_temp": cached_weather.get('temp', '--'),
-                        "vader_symbol": cached_weather.get('symbol', '1'),
-                        "vader_ikon": ikon_namn,
-                        "kalender_dagar": calendar_view,
-                        "avgangar": cached_departures,
-                        "spotify": spotify_status}
-            print("raw data: ")
-            print(raw_data)
             
             html_content = template.render(
                 hallplats_namn=cached_stop_name,
@@ -237,21 +242,22 @@ def main():
             
             if success and os.path.exists(image_filename):
                 img = Image.open(image_filename)
-                
                 img_bw = img.convert("1")
 
                 if epd:
                     buffer = epd.getbuffer(img_bw)
                     
+                    # Full clear varje hel timme för att förhindra ghosting
                     if now.minute == 0 and now.second < 10:
-                        print("Full refresh...")
+                        print("Full refresh med Clear...")
                         epd.init()
+                        epd.Clear()
                         epd.display(buffer)
                     else:
-                        print("Partial refresh...")
-                        epd.init_part()
-                        epd.display_Partial(buffer)
-                    
+                        print("Uppdaterar display...")
+                        epd.init()
+                        epd.display(buffer)
+
                     epd.sleep()
                 else:
                     print(f"Simulering klar: {len(cached_departures)} bussar hittades. Bild sparad som {image_filename}")
