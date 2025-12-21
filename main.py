@@ -255,7 +255,7 @@ def main():
                         epd.display(buffer)
                     else:
                         print("Uppdaterar display...")
-                        epd.init()
+                        epd.init_part()
                         epd.display(buffer)
 
                     epd.sleep()
