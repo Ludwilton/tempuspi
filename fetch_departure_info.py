@@ -9,7 +9,6 @@ load_dotenv()
 
 
 def get_access_token(client_id=None, secret=None):
-    """Hämtar OAuth2-token från Västtrafik."""
     client_id = client_id or os.environ.get("VASTTRAFIK_API_KEY")
     secret = secret or os.environ.get("VASTTRAFIK_SECRET")
     
@@ -160,7 +159,6 @@ def extract_board_data(stop_area_gid, filter_platforms=None):
         except:
             line_num = 9999
         
-        # Returnera (Tid, Linjenummer)
         return (x['sort_time'], line_num)
 
     board_rows.sort(key=sort_logic)

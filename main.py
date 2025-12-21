@@ -32,8 +32,8 @@ LATITUDE = os.environ.get("LATITUDE")
 platform = os.environ.get("DEPARTURE_PLATFORM")
 DATA_FETCH_INTERVAL = 300 
 
-# Nattläge-inställningar
-NIGHT_MODE_START = 3   # Klockan 02:00
+
+NIGHT_MODE_START = 3   # Klockan 03:00
 NIGHT_MODE_END = 5     # Klockan 05:00
 NIGHT_MODE_SLEEP = 300  # 5 minuter mellan uppdateringar på natten
 
@@ -145,7 +145,6 @@ def take_screenshot(html_file_path, output_file_path):
 
 
 def is_night_mode(current_hour):
-    """Kollar om vi är i nattläge (02:00 - 05:00)"""
     return NIGHT_MODE_START <= current_hour < NIGHT_MODE_END
 
     
@@ -161,7 +160,6 @@ def main():
     env = Environment(loader=file_loader)
     template = env.get_template('dashboard.html')
     
-    # Init variabler
     cached_departures = []
     cached_events = []
     cached_weather = {'temp': '--', 'symbol': 'na'}
@@ -170,8 +168,6 @@ def main():
     try:
         while True:
             now = datetime.datetime.now()
-            
-            # Nattläge: hoppa över uppdatering och sov längre
             if is_night_mode(now.hour):
                 print(f"[{now.strftime('%H:%M')}] Nattläge - sover i {NIGHT_MODE_SLEEP}s...")
                 if epd:
@@ -247,7 +243,6 @@ def main():
                 if epd:
                     buffer = epd.getbuffer(img_bw)
                     
-                    # Full clear varje hel timme för att förhindra ghosting
                     if now.minute == 0 and now.second < 10:
                         print("Full refresh med Clear...")
                         epd.init()
