@@ -259,8 +259,14 @@ def main():
             else:
                 print("Kunde inte generera bild, hoppar över skärmuppdatering.")
 
-            seconds_to_sleep = 60 - datetime.datetime.now().second
-            time.sleep(seconds_to_sleep + 1) 
+            now_after_update = datetime.datetime.now()
+            seconds_until_next_minute = 60 - now_after_update.second
+            
+            if seconds_until_next_minute < 1:
+                seconds_until_next_minute += 60
+            
+            print(f"Väntar {seconds_until_next_minute}s till nästa minut...")
+            time.sleep(seconds_until_next_minute)
 
     except KeyboardInterrupt:
         print("Avslutar...")
