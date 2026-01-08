@@ -12,13 +12,5 @@ It fetches data from multiple APIs and renders them as a clean, customizable HTM
 - **Spotify**: Now playing track information
 - **Multiple Layouts**: Various dashboard styles to choose from
 
-## Project Structure
-
-The project consists of:
-- API fetchers for each data source (weather, calendar, transit, Spotify)
-- HTML templates with different visual styles
-- Display drivers for various Waveshare e-ink screens
-- Main orchestrator that combines everything and updates the display
-
 ![TempusPi Dashboard](assets/dashboardjpg1.jpg)
 ![Dashboard demo](assets/dashboardjpg2.jpg)
