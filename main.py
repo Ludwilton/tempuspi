@@ -14,13 +14,13 @@ from playwright.sync_api import sync_playwright
 
 
 # PI:
-from waveshare_epd import epd7in5_V2 as epd_driver
+# from waveshare_epd import epd7in5_V2 as epd_driver
 
 
 # Windows debug 
 # CHROME_COMMAND = r"C:/Users/ludwi/Desktop/repos/chrome-headless-shell-win64/chrome-headless-shell.exe"
-# epd_driver = None
-    
+epd_driver = None
+CHROME_COMMAND = "chromium/chrome-mac-arm64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing"   
 DISPLAY_WIDTH = 480
 DISPLAY_HEIGHT = 800
 
@@ -198,7 +198,7 @@ def main():
 
     file_loader = FileSystemLoader('.')
     env = Environment(loader=file_loader)
-    template = env.get_template('dashboard.html')
+    template = env.get_template('dashboard_orig.html')
     
     cached_departures = []
     cached_events = []
