@@ -16,7 +16,7 @@ def fetch_weather_data(lat,lon):
     
     temp = next((item['values'][0] for item in params if item['name'] == 't'), None)
     symbol = next((item['values'][0] for item in params if item['name'] == 'Wsymb2'), None)
-    
+    temp = round(temp)
     return {"temp": temp, "symbol": symbol}
     
 # weather=fetch_weather_data(lat=LATITUDE, lon=LONGITUDE)
