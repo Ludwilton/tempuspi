@@ -15,9 +15,6 @@ if __name__ == "__main__":
     from dotenv import load_dotenv
     import os  
     load_dotenv()
-    
-
-
     ICS_URL = os.environ.get("ICS_URL")
     result =  get_calendar_events(ICS_URL)
     print(result)

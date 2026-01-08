@@ -19,34 +19,33 @@ def fetch_weather_data(lat,lon):
     temp = round(temp)
     return {"temp": temp, "symbol": symbol}
     
-# weather=fetch_weather_data(lat=LATITUDE, lon=LONGITUDE)
-
 """
-1	Klart	Himlen är fri från moln
-2	Lätt molnighet	Nästan klart, lite moln
-3	Halvklart	Blandat sol och moln
-4	Molnigt	Mer moln än sol
-5	Mycket moln	Himlen täckt av moln (men inte "tjockt")
-6	Mulet	Helt grått och tjockt molntäcke
-7	Dimma	Sikt reducerad
-8	Lätta regnskurar	Korta perioder av lätt regn
-9	Regnskurar	Korta perioder av vanligt regn
-10	Kraftiga regnskurar	Korta perioder av ösregn
-11	Åskskurar	Regnskurar med åska
-12	Lätta byar av snöblandat regn	
-13	Byar av snöblandat regn	
-14	Kraftiga byar av snöblandat regn	
+Wsymb2 legend:
+1	Klart
+2	Lätt molnighet
+3	Halvklart
+4	Molnigt
+5	Mycket moln
+6	Mulet
+7	Dimma
+8	Lätta regnskurar
+9	Regnskurar
+10	Kraftiga regnskurar
+11	Åskskurar
+12	Lätt snöblandat regn	
+13	snöblandat regn	
+14	Kraftigt snöblandat regn	
 15	Lätta snöbyar	
 16	Snöbyar	
 17	Kraftiga snöbyar	
-18	Lätt regn	Ihållande lätt regn
-19	Regn	Ihållande regn
-20	Kraftigt regn	Ihållande ösregn
-21	Åska	Ihållande regn med åska
-22	Lätt snöblandat regn	Ihållande
-23	Snöblandat regn	Ihållande
-24	Kraftigt snöblandat regn	Ihållande
-25	Lätt snöfall	Ihållande
-26	Snöfall	Ihållande
-27	Kraftigt snöfall	Ihållande
+18	Lätt regn	
+19	Regn	
+20	Kraftigt regn	
+21	Åska	
+22	Lätt snöblandat regn	
+23	Snöblandat regn	
+24	Kraftigt snöblandat regn	
+25	Lätt snöfall	
+26	Snöfall	
+27	Kraftigt snöfall	
 """

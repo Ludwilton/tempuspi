@@ -45,7 +45,7 @@ def get_departures(access_token, stop_area_gid, time_span_in_minutes=180):
 def format_time(dep_obj):
     """
     Hjälpfunktion för att skapa tidssträngar för displayen.
-    Returnerar strängar som 'Nu', '5 min', '14:25' eller 'Inst'.
+    Returnerar strängar som 'Nu', '5', '14:25' eller 'Inst'.
     """
     if not dep_obj:
         return ""
@@ -69,7 +69,8 @@ def extract_board_data(stop_area_gid, filter_platforms=None):
     api_response = get_departures(token, stop_area_gid)
     now = datetime.now().astimezone()
     
-    if isinstance(filter_platforms, str):
+    # om flera platformar på samma gid men vill endast visa en
+    if isinstance(filter_platforms, str): 
         filter_platforms = [filter_platforms]
 
     stop_name = None
