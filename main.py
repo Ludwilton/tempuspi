@@ -209,7 +209,7 @@ def main():
             if is_night_mode(now.hour):
                 print(f"[{now.strftime('%H:%M')}] Nattläge - sover i {NIGHT_MODE_SLEEP}s...")
                 if epd:
-                    epd.sleep()
+                    epd.clear()
                 time.sleep(NIGHT_MODE_SLEEP)
                 continue
 
