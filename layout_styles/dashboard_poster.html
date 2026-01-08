@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=480, height=800, initial-scale=1.0">
-    <title>Dashboard Skeleton</title>
+    <title>Dashboard</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -21,7 +21,6 @@
             position: relative;
         }
         
-
         body::after {
             content: '';
             position: fixed;
@@ -41,7 +40,6 @@
         .grotesk { font-family: 'Space Grotesk', sans-serif; font-weight: 700; }
         .courier { font-family: 'Courier Prime', monospace; }
         
-
         .statement-time {
             font-size: 280px;
             line-height: 0.75;
@@ -51,13 +49,11 @@
             transform: rotate(180deg);
         }
         
-
         .vertical-text {
             writing-mode: vertical-rl;
             text-orientation: mixed;
         }
         
-
         .event-strip {
             background: #000;
             color: #fff;
@@ -72,7 +68,6 @@
             clip-path: polygon(0 0, 100% 0, 98% 100%, 0 100%);
         }
         
-
         .transit-minimal {
             position: relative;
             padding: 12px 0;
@@ -94,7 +89,6 @@
             text-align: center;
         }
         
-
         .diagonal-accent {
             position: absolute;
             background: #000;
@@ -105,32 +99,23 @@
 </head>
 <body>
     
-    <div class="relative w-full h-full text-black">
-        
-
-        <div class="absolute inset-0 flex">
-            
-
-            <div class="relative flex items-center justify-center" style="width: 200px;">
+    <div class="relative w-full h-full text-black"><div class="absolute inset-0 flex"><div class="relative flex items-center justify-center" style="width: 200px;">
 
                 <div class="statement-time archivo" style="color: #000; font-size: 240px;">
                     {{ klockslag }}
                 </div>
                 
-
                 <div class="absolute bottom-8 left-8">
                     <div class="text-5xl archivo leading-none">{{ vader_temp }}°</div>
                     <div class="text-[8px] courier tracking-widest opacity-40 mt-1">TEMP</div>
                 </div>
                 
-
                 <div class="absolute top-8 left-8 vertical-text">
                     <div class="text-sm grotesk tracking-widest opacity-60 mb-2">{{ datum_dag|upper }}</div>
                     <div class="text-4xl archivo leading-none">{{ datum_manad[:3]|upper }}</div>
                 </div>
             </div>
             
-
             <div class="flex-1 flex flex-col p-8 relative" style="padding-left: 24px;">
                 
                 {% if spotify and spotify.is_playing %}
@@ -154,12 +139,10 @@
                     </div>
                 {% endif %}
                 
-
                 <div class="flex-1 mb-6 min-h-0">
                     <div class="text-[10px] courier tracking-widest mb-4 opacity-50">THIS WEEK</div>
                     
                     <div class="h-full flex gap-[3px] relative">
-
                         <div class="absolute left-0 right-0 top-0 h-full pointer-events-none" style="z-index: 0;">
                             <div class="absolute left-0 right-0 h-px bg-black opacity-10" style="top: 25%;"></div>
                             <div class="absolute left-0 right-0 h-px bg-black opacity-10" style="top: 50%;"></div>
@@ -169,12 +152,9 @@
                         {% if kalender_dagar %}
                             {% for day in kalender_dagar %}
                             <div class="flex-1 relative" style="z-index: 1;">
-
-                                <div class="absolute -top-5 left-0 right-0 text-center text-[9px] courier font-bold opacity-60">
                                     {{ day.namn[0] }}
                                 </div>
                                 
-
                                 <div class="h-full relative" style="border-left: 1px solid rgba(0,0,0,0.1);">
                                     {% if day.events %}
                                         {% for event in day.events %}
@@ -182,7 +162,6 @@
                                             {% set duration = (event.end - event.start) if (event.end and event.start) else 1 %}
                                             {% set height_pct = (duration / 18 * 100) %}
                                             
-
                                             <div class="event-strip courier absolute" 
                                                  style="
                                                     top: {{ start_pct }}%; 
@@ -205,7 +184,6 @@
                     </div>
                 </div>
                 
-
                 <div>
                     <div class="flex items-center gap-2 mb-4">
                         <div class="text-[10px] courier tracking-widest opacity-50">
@@ -219,17 +197,13 @@
                             {% for bus in avgangar[:3] %}
                             <div class="transit-minimal">
                                 <div class="flex items-center justify-between mb-2">
-
-                                    <div class="transit-num-block archivo shrink-0">{{ bus.line }}</div>
                                     
-
                                     <div class="text-right shrink-0">
                                         <div class="text-4xl archivo tabular-nums leading-none">{{ bus.next }}</div>
                                         <div class="text-[9px] courier opacity-40 mt-1">+{{ bus.later }}</div>
                                     </div>
                                 </div>
                                 
-
                                 <div class="text-sm grotesk uppercase pl-1">{{ bus.destination }}</div>
                             </div>
                             {% endfor %}
@@ -241,11 +215,9 @@
             </div>
         </div>
         
-
         <div class="diagonal-accent" style="top: 15%; left: 0; width: 60%; transform: rotate(-2deg);"></div>
         <div class="diagonal-accent" style="bottom: 25%; right: 0; width: 40%; transform: rotate(1deg);"></div>
         
-
         <div class="absolute top-4 left-4 w-8 h-8 border-l border-t border-black opacity-30"></div>
         <div class="absolute top-4 right-4 w-8 h-8 border-r border-t border-black opacity-30"></div>
         <div class="absolute bottom-4 left-4 w-8 h-8 border-l border-b border-black opacity-30"></div>

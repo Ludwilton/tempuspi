@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=480, height=800, initial-scale=1.0">
-    <title>Editorial Dashboard</title>
+    <title>Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&display=swap" rel="stylesheet">
@@ -25,7 +25,6 @@
             box-sizing: border-box;
         }
 
-        /* Typography Scaling */
         .text-fluid-huge { font-size: 8rem; line-height: 0.8; letter-spacing: -0.05em; }
         .text-fluid-large { font-size: 3rem; line-height: 0.9; letter-spacing: -0.03em; }
         .text-fluid-mid { font-size: 1.8rem; line-height: 1; letter-spacing: -0.02em; }
@@ -69,13 +68,11 @@
             </div>
 
             {% if spotify and spotify.is_playing %}
-                <!-- SMALLER CLOCK WHEN MUSIC IS PLAYING -->
                 <div class="flex items-end justify-between">
                     <div class="font-bold text-[5rem] tracking-tighter -ml-2 text-black leading-none">
                         {{ klockslag }}
                     </div>
                     
-                    <!-- MUSIC INFO -->
                     <div class="flex items-end gap-3 min-w-0 flex-1 ml-4 pb-1">
                         <div class="flex flex-col justify-end min-w-0 flex-1">
                             <div class="font-bold text-lg leading-tight tracking-tight truncate">{{ spotify.track }}</div>
@@ -86,7 +83,6 @@
                     </div>
                 </div>
             {% else %}
-                <!-- LARGE CLOCK WHEN NO MUSIC -->
                 <div class="font-bold text-fluid-huge tracking-tighter -ml-2 text-black">
                     {{ klockslag }}
                 </div>

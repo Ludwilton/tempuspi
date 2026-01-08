@@ -11,7 +11,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     
     <style>
-        /* 2025 DESIGN SYSTEM */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         html, body {
@@ -31,7 +30,6 @@
             font-feature-settings: 'zero';
         }
         
-        /* BRUTALIST GRID SYSTEM */
         .grid-main {
             display: grid;
             grid-template-rows: auto 1fr auto;
@@ -39,8 +37,6 @@
             padding: 24px;
             gap: 32px;
         }
-        
-        /* TYPOGRAPHY SCALE - ARCHITECTURAL */
         .type-hero { 
             font-size: 88px; 
             font-weight: 200; 
@@ -74,14 +70,12 @@
             letter-spacing: 0.1em;
         }
         
-        /* ACCENT SYSTEM - NOW */
         .accent-primary { color: #0A0A0A; }
         .accent-now { 
             background: #0A0A0A; 
             color: #FAFAFA;
         }
         
-        /* CALENDAR - MUSICAL NOTATION */
         .calendar-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
@@ -147,7 +141,6 @@
             max-width: 100%;
         }
         
-        /* TRANSIT - BOLD GRAPHIC */
         .transit-list {
             display: flex;
             flex-direction: column;
@@ -203,7 +196,6 @@
             margin-left: 6px;
         }
         
-        /* WEATHER - ICONIC */
         .weather-icon {
             width: 48px;
             height: 48px;
@@ -217,7 +209,6 @@
             line-height: 1;
         }
         
-        /* STATUS BADGE */
         .status-badge {
             display: inline-flex;
             align-items: center;
@@ -245,21 +236,17 @@
 <body>
     <div class="grid-main">
         
-        <!-- PENTHOUSE: TIME & CONTEXT -->
         <header>
             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
-                <!-- Date Badge -->
                 <div style="display: flex; align-items: center; gap: 8px;">
                     <div class="type-caption accent-primary mono">{{ datum_dag }}</div>
                     <div class="type-caption" style="color: #666;">{{ datum_manad }}</div>
                 </div>
                 
-                <!-- Location -->
                 <div class="type-micro mono" style="color: #999;">GBG</div>
             </div>
             
             <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                <!-- Hero Time -->
                 <div>
                     <div class="type-hero mono">{{ klockslag }}</div>
                     <div class="status-badge type-micro mono" style="margin-top: 8px;">
@@ -268,7 +255,6 @@
                     </div>
                 </div>
                 
-                <!-- Weather -->
                 <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 8px;">
                     <i data-lucide="{{ vader_ikon }}" class="weather-icon"></i>
                     <div class="temp-display">{{ vader_temp }}°</div>
@@ -276,7 +262,6 @@
             </div>
         </header>
         
-        <!-- LIVING SPACE: CALENDAR -->
         <section style="min-height: 0;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
                 <h2 class="type-headline accent-primary">Denna Vecka</h2>
@@ -319,7 +304,6 @@
             </div>
         </section>
         
-        <!-- GROUND FLOOR: TRANSIT -->
         <footer>
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
                 <h2 class="type-headline accent-primary">{{ hallplats_namn | default('Transit') }}</h2>
@@ -353,7 +337,6 @@
     </div>
 
     <script>
-        // Lucide Icons
         window.onload = function() {
             if (window.lucide) { 
                 lucide.createIcons(); 

@@ -3,14 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=480, height=800, initial-scale=1.0">
-    <title>2025 E-Ink Dashboard</title>
+    <title>Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     
     <style>
-        /* 2025 DESIGN SYSTEM */
         html, body {
             width: 480px;
             height: 800px;
@@ -26,22 +25,18 @@
         
         .mono { font-family: 'JetBrains Mono', monospace; }
         
-        /* ULTRA MINIMAL BORDERS - 2025 STYLE */
         .line { border-top: 1px solid black; }
         .line-thick { border-top: 2px solid black; }
         .divider { height: 1px; background: black; opacity: 0.15; }
         
-        /* TYPOGRAPHY SCALE */
         .text-micro { font-size: 9px; letter-spacing: 0.8px; }
         .text-label { font-size: 10px; letter-spacing: 0.6px; font-weight: 600; }
         .text-data { font-size: 11px; letter-spacing: -0.01em; }
         
-        /* SMART SPACING - 2025 BREATHABLE DESIGN */
         .section { padding: 16px 20px; }
         .section-sm { padding: 12px 20px; }
         .section-xs { padding: 8px 20px; }
         
-        /* ACCENT SYSTEM */
         .accent-dot { 
             width: 4px; 
             height: 4px; 
@@ -49,7 +44,6 @@
             border-radius: 50%;
         }
         
-        /* PROGRESSIVE DISCLOSURE */
         .card {
             background: white;
             border: 1px solid rgba(0,0,0,0.08);
@@ -65,7 +59,6 @@
             background: black;
         }
         
-        /* CALENDAR - 2025 MINIMAL GRID */
         .cal-day {
             position: relative;
             display: flex;
@@ -87,7 +80,6 @@
             border: 1.5px solid black;
         }
         
-        /* TRANSIT - DATA STORYTELLING */
         .transit-row {
             display: flex;
             align-items: center;
@@ -123,7 +115,6 @@
             letter-spacing: -0.01em;
         }
         
-        /* WEATHER - CONTEXTUAL DESIGN */
         .weather-icon {
             width: 40px;
             height: 40px;
@@ -137,7 +128,6 @@
             line-height: 1;
         }
         
-        /* STATUS INDICATORS */
         .status-badge {
             display: inline-flex;
             align-items: center;
@@ -150,7 +140,6 @@
             letter-spacing: 0.5px;
         }
         
-        /* ANIMATION HINTS FOR PHYSICAL DISPLAYS */
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
@@ -161,7 +150,6 @@
 </head>
 <body class="fade-in">
 
-    <!-- HEADER - AMBIENT CONTEXT -->
     <header class="section-xs line-thick">
         <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
@@ -173,10 +161,8 @@
         </div>
     </header>
 
-    <!-- HERO - TIME & WEATHER CONTEXT -->
     <section class="section" style="padding-bottom: 20px;">
         <div class="flex items-start justify-between">
-            <!-- Time Display -->
             <div>
                 <div style="font-size: 72px; font-weight: 300; letter-spacing: -0.05em; line-height: 0.9; margin-bottom: 4px;">
                     {{ klockslag }}
@@ -187,7 +173,6 @@
                 </div>
             </div>
             
-            <!-- Weather Context -->
             <div class="flex flex-col items-end gap-2" style="margin-top: 8px;">
                 <i data-lucide="{{ vader_ikon }}" class="weather-icon"></i>
                 <div class="temp-large">{{ vader_temp }}°</div>
@@ -197,7 +182,6 @@
 
     <div class="divider" style="margin: 0 20px;"></div>
 
-    <!-- WEEK SCHEDULE - CONTEXTUAL CALENDAR -->
     <section class="section">
         <div class="flex items-center justify-between mb-3">
             <h2 class="text-label uppercase">Denna Vecka</h2>
@@ -251,7 +235,6 @@
 
     <div class="divider" style="margin: 0 20px;"></div>
 
-    <!-- TRANSIT - ACTIONABLE DEPARTURES -->
     <section class="section-sm" style="padding: 8px 20px 0;">
         <div class="flex items-center justify-between mb-1">
             <div class="flex items-center gap-2">
@@ -266,19 +249,16 @@
                 <div class="transit-row" style="border-bottom: 1px solid rgba(0,0,0,0.06); padding: 4px 0;">
                     <div class="highlight-bar"></div>
                     
-                    <!-- Line Number -->
                     <div class="transit-line shrink-0" style="width: 22px; height: 22px; font-size: 11px;">
                         {{ bus.line }}
                     </div>
                     
-                    <!-- Destination -->
                     <div class="flex-1 px-2">
                         <div class="text-data font-medium" style="letter-spacing: -0.01em; font-size: 11px;">
                             {{ bus.destination }}
                         </div>
                     </div>
                     
-                    <!-- Times -->
                     <div class="flex items-baseline gap-1 shrink-0">
                         <div class="time-primary" style="font-size: 16px;">{{ bus.next }}</div>
                         <div class="time-secondary" style="font-size: 9px;">{{ bus.later }}</div>
@@ -293,7 +273,6 @@
         </div>
     </section>
 
-    <!-- FOOTER - SYSTEM STATUS -->
     <footer style="position: absolute; bottom: 0; left: 0; right: 0; padding: 8px 20px; border-top: 1px solid rgba(0,0,0,0.06);">
         <div class="flex items-center justify-between">
             <div class="mono text-micro" style="color: #999;">SYSTEM/OK</div>
@@ -302,7 +281,6 @@
     </footer>
 
     <script>
-        // Lucide Icons
         window.onload = function() {
             if (window.lucide) { 
                 lucide.createIcons(); 

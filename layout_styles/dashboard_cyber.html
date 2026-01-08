@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=480, height=800, initial-scale=1.0">
-    <title>Award Winning Dashboard</title>
+    <title>Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;800&family=Archivo+Black&display=swap" rel="stylesheet">
@@ -209,7 +209,6 @@
 
                 let dayEventsHtml = '';
                 
-                // HÄR ÄR FIXEN: Vi loopar igenom 'events' (plural) listan
                 if (dayData.events && dayData.events.length > 0) {
                     dayData.events.forEach((evt) => {
                         const start = evt.start || 8; 
