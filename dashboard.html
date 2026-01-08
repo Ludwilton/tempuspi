@@ -3,13 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=480, height=800, initial-scale=1.0">
-    <title>Brutalist Dashboard</title>
+    <title>Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Archivo+Black&display=swap" rel="stylesheet">
     
     <style>
-        /* GLOBAL RESET & FONTS */
         html, body {
             width: 480px;
             height: 800px;
@@ -22,7 +21,6 @@
         
         .font-display { font-family: 'Archivo Black', sans-serif; }
 
-        /* Brutalist Borders */
         .b-b { border-bottom: 3px solid black; }
         .b-t { border-top: 3px solid black; }
         .b-r { border-right: 3px solid black; }
@@ -51,21 +49,18 @@
 
     {% if spotify and spotify.is_playing %}
 
-        <!-- ==================== MUSIK SPELAS ==================== -->
         <div class="flex flex-col justify-center">
-            <!-- STÖRRE KLOCKA NÄR MUSIK SPELAS -->
+
             <div class="font-display text-[4.5rem] leading-none tracking-tighter">
                 {{ klockslag }}
             </div>
 
-            <!-- VÄDER UNDER KLOCKAN -->
             <div class="flex items-center mt-2">
                 <span class="font-display text-3xl mr-2">{{ vader_temp }}°</span>
                 <i data-lucide="{{ vader_ikon }}" class="w-8 h-8 stroke-[3]"></i>
             </div>
         </div>
 
-        <!-- MUSIKINFO TILL HÖGER - STÖRRE -->
         <div class="flex flex-1 items-center justify-end min-w-0 pl-2">
             
             <div class="flex flex-col text-right mr-3 min-w-0">
@@ -80,7 +75,6 @@
 
     {% else %}
 
-        <!-- ==================== INGEN MUSIK – STÖRRE LAYOUT ==================== -->
         <div class="font-display text-[6.5rem] leading-none tracking-tighter -ml-1">
             {{ klockslag }}
         </div>
@@ -166,7 +160,6 @@
     </section>
 
     <script>
-        // Lucide loading fix
         window.onload = function() {
             if (window.lucide) { lucide.createIcons(); } 
             else { setTimeout(() => { if (window.lucide) lucide.createIcons(); }, 500); }
@@ -204,7 +197,6 @@
 
                 let dayEventsHtml = '';
                 
-                // HÄR ÄR ÄNDRINGEN: Loopar igenom events-listan
                 if (dayData.events && dayData.events.length > 0) {
                     dayData.events.forEach((evt) => {
                         const start = evt.start || 8; 
@@ -214,7 +206,6 @@
                         if (height < 5) height = 5; 
 
                         if (isToday) {
-                            // Brutalist Style: Vit box med tjock svart kant och hård skugga
                             dayEventsHtml += `
                                 <div class="absolute w-full px-1 z-20" style="top: ${top}%; height: ${height}%;">
                                     <div class="bg-white text-black h-full w-full border-[3px] border-black p-1 overflow-hidden flex flex-col justify-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] relative">
@@ -223,7 +214,6 @@
                                 </div>
                             `;
                         } else {
-                            // Brutalist Style: Solid svart block
                             dayEventsHtml += `
                                 <div class="absolute w-full flex justify-center z-10 px-0.5" style="top: ${top}%; height: ${height}%;">
                                     <div class="bg-black w-full h-full opacity-100 border border-black" title="${evt.name}"></div>

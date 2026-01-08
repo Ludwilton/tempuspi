@@ -198,7 +198,7 @@ def main():
 
     file_loader = FileSystemLoader('.')
     env = Environment(loader=file_loader)
-    template = env.get_template('dashboard_orig.html')
+    template = env.get_template('dashboard.html')
     
     cached_departures = []
     cached_events = []

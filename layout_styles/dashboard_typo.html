@@ -55,8 +55,8 @@
 
     <main class="flex-1 flex flex-col min-w-0 h-full">
 
-        <header class="h-[190px] flex flex-col justify-end pb-5 divider-thick relative">
-            <div class="flex justify-between items-end mb-2">
+        <header class="flex flex-col pb-3 divider-thick relative">
+            <div class="flex justify-between items-start pt-2 mb-3">
                 <div class="flex flex-col">
                     <span class="text-xs font-bold uppercase tracking-widest text-gray-400 mb-0.5">{{ datum_manad }}</span>
                     <span class="text-3xl font-bold uppercase leading-none tracking-tight">{{ datum_dag }}</span>
@@ -68,15 +68,35 @@
                 </div>
             </div>
 
-            <div class="font-bold text-fluid-huge tracking-tighter -ml-2 text-black">
-                {{ klockslag }}
-            </div>
+            {% if spotify and spotify.is_playing %}
+                <!-- SMALLER CLOCK WHEN MUSIC IS PLAYING -->
+                <div class="flex items-end justify-between">
+                    <div class="font-bold text-[5rem] tracking-tighter -ml-2 text-black leading-none">
+                        {{ klockslag }}
+                    </div>
+                    
+                    <!-- MUSIC INFO -->
+                    <div class="flex items-end gap-3 min-w-0 flex-1 ml-4 pb-1">
+                        <div class="flex flex-col justify-end min-w-0 flex-1">
+                            <div class="font-bold text-lg leading-tight tracking-tight truncate">{{ spotify.track }}</div>
+                            <div class="text-sm text-gray-600 leading-tight truncate">{{ spotify.artist }}</div>
+                            <div class="text-xs text-gray-400 leading-tight truncate">{{ spotify.album }}</div>
+                        </div>
+                        <img src="{{ spotify.image }}" class="w-20 h-20 object-cover shadow-lg" alt="Album art">
+                    </div>
+                </div>
+            {% else %}
+                <!-- LARGE CLOCK WHEN NO MUSIC -->
+                <div class="font-bold text-fluid-huge tracking-tighter -ml-2 text-black">
+                    {{ klockslag }}
+                </div>
+            {% endif %}
         </header>
 
-        <section class="h-[280px] flex flex-col py-6 relative">
+        <section class="flex-1 flex flex-col py-6 relative min-h-0">
             <div class="flex justify-between items-baseline mb-4">
                 <h2 class="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">Sequence</h2>
-                <span class="text-[10px] font-mono text-gray-400">06:00 — 00:00</span>
+                <span class="text-[10px] font-mono text-gray-400">06:00 – 00:00</span>
             </div>
 
             <div class="h-[20px] flex w-full" id="calendar-header"></div>
@@ -91,7 +111,7 @@
             </div>
         </section>
 
-        <section class="flex-1 flex flex-col min-h-0 pt-4 border-t border-black">
+        <section class="flex flex-col min-h-0 pt-4 border-t border-black shrink-0">
             <div class="flex items-center justify-between mb-4">
                 <h2 class="text-fluid-mid font-bold leading-none tracking-tight truncate max-w-[70%]">
                     {{ hallplats_namn | default('DEPARTURES') }}
@@ -99,7 +119,7 @@
                 <span class="text-[9px] font-bold bg-black text-white px-2 py-1 rounded-sm tracking-wider">NOW</span>
             </div>
 
-            <div id="bus-list" class="flex-1 flex flex-col">
+            <div id="bus-list" class="flex-1 flex flex-col overflow-hidden max-h-[180px]">
                 {% if avgangar %}
                     {% for bus in avgangar[:3] %}
                     <div class="flex items-baseline py-3 border-b border-gray-100 group">
@@ -156,7 +176,6 @@
                 const widthClass = isToday ? 'w-2/5' : 'flex-1'; 
                 const textColor = isToday ? 'text-black font-bold' : 'text-gray-300 font-normal';
                 
-                // 1. Skapa Header för dagen (M, T, O...)
                 headerHtml += `
                     <div class="${widthClass} flex items-end justify-center text-[10px] uppercase tracking-wider ${textColor}">
                         ${dayData.namn}
@@ -165,18 +184,15 @@
 
                 let dayEventsHtml = '';
 
-                // 2. Loopa igenom listan 'events' istället för att leta efter 'event' direkt på objektet
                 if (dayData.events && dayData.events.length > 0) {
                     dayData.events.forEach((evt) => {
                         const start = evt.start || 8; 
                         const end = evt.end || 9;
                         const top = getTopPercent(start);
                         let height = ((end - start) / totalHours) * 100;
-                        if (height < 4) height = 4; // Minsta höjd för att synas
+                        if (height < 4) height = 4;
 
                         if (isToday) {
-                            // För "Idag": Svarta boxar med text. 
-                            // Lade till 'border-white' så att boxar som ligger kant-i-kant syns separerade.
                             dayEventsHtml += `
                                 <div class="absolute w-full z-20" style="top: ${top}%; height: ${height}%;">
                                     <div class="bg-black text-white w-full h-full flex flex-col justify-center p-1.5 shadow-lg border-b border-white overflow-hidden">
@@ -185,7 +201,6 @@
                                 </div>
                             `;
                         } else {
-                            // För andra dagar: Gråa boxar utan text (för renare look)
                             dayEventsHtml += `
                                 <div class="absolute w-full z-10" style="top: ${top}%; height: ${height}%;">
                                     <div class="bg-gray-100 w-full h-full border-b border-white" title="${evt.name}"></div>
