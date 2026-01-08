@@ -6,9 +6,9 @@ It fetches data from multiple APIs and renders them as a clean, customizable HTM
 
 ## Features
 
-- **Weather**: Current temperature and conditions via SMHI weather API (Sweden)
+- **Weather**: Current temperature and conditions via SMHI weather API
 - **Calendar**: Upcoming events from ICS calendar feeds
-- **Public Transit**: Live departure times from Västtrafik (Sweden)
+- **Public Transit**: Live public transport departure times
 - **Spotify**: Now playing track information
 - **Multiple Layouts**: Various dashboard styles to choose from
 
