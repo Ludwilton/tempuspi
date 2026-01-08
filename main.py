@@ -44,9 +44,6 @@ browser_instance = None
 page_instance = None
 
 def prepare_calendar_data(events):
-    """
-    Skapar en fast Mån-Sön vy för nuvarande vecka.
-    """
     week_view = []
     now = datetime.datetime.now()
     today_date = now.date()
@@ -149,7 +146,6 @@ def init_browser():
 
 
 def take_screenshot_playwright(html_file_path, output_file_path):
-    """screenshot med Playwright - browser stannar igång mellan anrop"""
     global page_instance
     
     try:
@@ -171,7 +167,6 @@ def take_screenshot_playwright(html_file_path, output_file_path):
 
 
 def cleanup_browser():
-    """Stäng browser vid avslut"""
     global playwright_instance, browser_instance, page_instance
     
     if page_instance:
@@ -263,7 +258,7 @@ def main():
             print("Hämtar Spotify...")
             try:
                 spotify_status = get_spotify_data()
-                print(f"⏱️  Spotify: {time.time()-start:.1f}s")
+                print(f"Spotify: {time.time()-start:.1f}s")
             except Exception as e:
                 print(f"Kunde inte hämta Spotify: {e}")
                 spotify_status = None
